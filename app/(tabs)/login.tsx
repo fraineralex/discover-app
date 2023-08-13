@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { darkMode as theme } from '../theme';
 import { FontAwesome } from '@expo/vector-icons';
+import auth0 from '../config';
 
 export default function login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +19,18 @@ export default function login() {
   const [password, setPassword] = useState('');
 
   const onLoginPress = () => {
-
+    auth0.auth
+      .passwordRealm({
+        username,
+        password,
+        realm: 'Username-Password-Authentication',
+      })
+      .then(credentials => {
+        console.log('Inicio de sesión exitoso:', credentials);
+      })
+      .catch(error => {
+        console.error('Error de inicio de sesión:', error);
+      });
   };
 
   return (
@@ -104,6 +116,7 @@ const styles = StyleSheet.create({
     placeholderTextColor: theme.tabInactive,
     marginLeft: 20,
     marginRight: 30,
+    color: theme.secondary,
   },
   loginFormTextPassword: {
     height: 43,
@@ -117,7 +130,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     placeholderTextColor: theme.tabInactive,
     width: 305,
-    marginLeft: 20
+    marginLeft: 20,
+    color: theme.secondary,
   },
   loginButton: {
     backgroundColor: theme.blue,
