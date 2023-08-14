@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import router from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -17,6 +16,7 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
 import { useRouter, Link } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,13 +27,29 @@ export default function LoginScreen() {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  useEffect(() => {
+    async function checkUser() {
+      const user = await SecureStore.getItemAsync('user');
+      const token = await SecureStore.getItemAsync('token');
+      if (user && token) {
+        router.replace('/home');
+      }
+    }
+
+    checkUser();
+  }, []);
+
   const handleSignIn = () => {
     password === '' ? Alert.alert('Please enter a password') : '';
     email === '' ? Alert.alert('Please enter an email') : '';
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        router.replace('/home');
+        user.getIdToken().then(async (token) => {
+          await SecureStore.setItemAsync('token', token);
+          await SecureStore.setItemAsync('user', JSON.stringify(user));
+          router.replace('/home');
+        });
       })
       .catch((error) => {
         Alert.alert(error.message.toString().replace('Firebase: ', ''));
@@ -52,12 +68,14 @@ export default function LoginScreen() {
             <Text style={styles.logoText}>Discover</Text>
             <TextInput
               placeholder="Email"
+              placeholderTextColor={theme.tabInactive}
               style={styles.loginFormTextInput}
               onChangeText={text => setEmail(text)}
             />
             <View style={styles.passwordContainer}>
               <TextInput
                 placeholder="Password"
+                placeholderTextColor={theme.tabInactive}
                 style={styles.loginFormTextPassword}
                 secureTextEntry={!showPassword}
                 onChangeText={text => setPassword(text)}
@@ -123,7 +141,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
-    placeholderTextColor: theme.tabInactive,
     marginLeft: 20,
     marginRight: 30,
     color: theme.secondary,
@@ -138,7 +155,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
-    placeholderTextColor: theme.tabInactive,
     width: 305,
     marginLeft: 20,
     color: theme.secondary,

@@ -3,6 +3,8 @@ import MapView from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Marker } from "react-native-maps";
+import { useRouter, Link } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 
 export default function HomeScreen() {
   const [location, setLocation] = React.useState({
@@ -14,8 +16,24 @@ export default function HomeScreen() {
       longitudeDelta: 0.01,
     }
   });
-  const [adrees, setAdrees] = React.useState();
+  const [adrees, setAdrees] = React.useState('');
   const [markerPlaces, setMarkerPlaces] = React.useState([]);
+  const [user, setUser] = React.useState(null)
+  const router = useRouter();
+
+  React.useEffect(() => {
+    async function checkUser() {
+      const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
+      const token = await SecureStore.getItemAsync('token');
+      if (!user && !token) {
+        router.replace('/login');
+      }
+
+      setUser(currentUser);
+    }
+
+    checkUser();
+  }, []);
 
   React.useEffect(() => {
     const permission = async () => {
@@ -58,7 +76,8 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Search location" value={adrees} onChangeText={setAdrees} />
+      {user && <Text>Welcome {user.email}</Text>}
+      <TextInput placeholder="Search location" value={adrees} onChangeText={text => setAdrees(text)} />
       <Button title="search adrees" onPress={get_locations} />
       <View style={styles.mapContainer}>
         <MapView
