@@ -1,14 +1,2 @@
-# Expo Router Example
-
-Use [`expo-router`](https://expo.github.io/router) to build native navigation using files in the `app/` directory.
-
-## 🚀 How to use
-
-```sh
-npx create-expo-app -e with-router
-```
-
-## 📝 Notes
-
-- [Expo Router: Docs](https://expo.github.io/router)
-- [Expo Router: Repo](https://github.com/expo/router)
+# Discover App
+Discover App is an interactive local tourism guide app developed using React Native and Expo. Explore your surroundings with immersive maps, receive personalized recommendations, and log your travel experiences digitally.
