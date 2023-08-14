@@ -13,29 +13,31 @@ import {
 } from "react-native";
 import { darkMode as theme } from '../theme';
 import { FontAwesome } from '@expo/vector-icons';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  const handleSignIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
+  const handleCreateAccount = () => {
+    password !== repeatPassword ? Alert.alert('Passwords do not match') : '';
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log('signed in!', user);
-        router.replace('/home');
+        console.log('User account created', user);
+        router.replace('/login');
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log('Error signed in:', errorCode, errorMessage);
+        console.log('Error creating account:', errorCode, errorMessage);
         Alert.alert(error)
       }
       )
@@ -46,7 +48,7 @@ export default function LoginScreen() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.loginScreenContainer}>
           <View style={styles.loginFormView}>
-            <Text style={styles.logoText}>Discover</Text>
+            <Text style={styles.logoText}>Create account</Text>
             <TextInput
               placeholder="Email"
               style={styles.loginFormTextInput}
@@ -64,22 +66,39 @@ export default function LoginScreen() {
                 onPress={() => setShowPassword(!showPassword)}
               >
                 <FontAwesome
-                  name={showPassword ? 'eye-slash' : 'eye'}
+                  name={!showPassword ? 'eye-slash' : 'eye'}
                   size={20}
                   color={theme.blue}
                 />
               </TouchableOpacity>
             </View>
-            <Text style={styles.forgotPasswordInput}>Forgot password?</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="Repeat password"
+                style={styles.loginFormTextPassword}
+                secureTextEntry={!showPassword}
+                onChangeText={text => setRepeatPassword(text)}
+              />
+              <TouchableOpacity
+                style={styles.showPasswordButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesome
+                  name={!showPassword ? 'eye-slash' : 'eye'}
+                  size={20}
+                  color={theme.blue}
+                />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               style={styles.loginButton}
-              onPress={handleSignIn}
+              onPress={handleCreateAccount}
             >
-              <Text style={styles.loginButtonText}>Sign in</Text>
+              <Text style={styles.loginButtonText}>Sign up</Text>
             </TouchableOpacity>
             <View style={styles.footerView}>
               <TouchableOpacity onPress={handleCreateAccount}>
-                <Text style={styles.firstButtonText}>Don't have an account? <Text style={styles.secondButtonText}>Sign up.</Text></Text>
+                <Text style={styles.firstButtonText}>You have an account? <Text style={styles.secondButtonText}>Sign in.</Text></Text>
               </TouchableOpacity>
             </View>
           </View>
