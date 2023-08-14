@@ -11,26 +11,35 @@ import {
 } from "react-native";
 import { darkMode as theme } from '../theme';
 import { FontAwesome } from '@expo/vector-icons';
-import auth0 from '../config';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../config';
+
+function HomeScreen()
 
 export default function login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onLoginPress = () => {
-    auth0.auth
-      .passwordRealm({
-        username,
-        password,
-        realm: 'Username-Password-Authentication',
-      })
-      .then(credentials => {
-        console.log('Inicio de sesión exitoso:', credentials);
-      })
-      .catch(error => {
-        console.error('Error de inicio de sesión:', error);
-      });
+
+  const onRegisterPress = async () => {
+    try {
+      await auth().createUserWithEmailAndPassword(email, password);
+      console.log('User registered successfully');
+    } catch (error) {
+      console.error('Error registering user:', error);
+    }
+  };
+
+  const onLoginPress = async () => {
+    try {
+      await auth().signInWithEmailAndPassword(email, password);
+      console.log('Login successful');
+      // Implement your navigation logic here
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -40,9 +49,9 @@ export default function login() {
           <View style={styles.loginFormView}>
             <Text style={styles.logoText}>Discover</Text>
             <TextInput
-              placeholder="Username"
+              placeholder="Email"
               style={styles.loginFormTextInput}
-              onChangeText={text => setUsername(text)}
+              onChangeText={text => setEmail(text)}
             />
             <View style={styles.passwordContainer}>
               <TextInput
