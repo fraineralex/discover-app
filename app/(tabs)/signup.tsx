@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import router from '../utils';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,40 +9,57 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
 import { darkMode as theme } from '../theme';
 import { FontAwesome } from '@expo/vector-icons';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+
 
 export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
+  const router = useRouter()
+  const [fullName, setFullName] = useState('');
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  const handleCreateAccount = () => {
-    password === '' ? Alert.alert('Please enter a password') : '';
-    email === '' ? Alert.alert('Please enter an email') : '';
-    password !== repeatPassword ? Alert.alert('Passwords do not match') : '';
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log('User account created', user);
-        router.replace('/login');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        Alert.alert(error.message.toString().replace('Firebase: ', ''));
-        const errorMessage = error.message;
-        console.log('Error creating account:', errorCode, errorMessage);
+  const handleCreateAccount = async () => {
+
+    if (password === '' || email === '' || fullName === '') {
+      Alert.alert('Please fill all the fields.');
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      Alert.alert('Passwords do not match.');
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      if (fullName) {
+        await updateProfile(user, {
+          displayName: fullName
+        });
+
+        console.log('User profile updated');
       }
-      )
+
+      router.replace('/login');
+    } catch (error) {
+      const errorCode = error.code;
+      Alert.alert(error.message.toString().replace('Firebase: ', ''));
+      const errorMessage = error.message;
+      console.log('Error creating account:', errorCode, errorMessage);
+    }
   };
 
   return (
@@ -53,13 +69,21 @@ export default function SignUpScreen() {
           <View style={styles.loginFormView}>
             <Text style={styles.logoText}>Create account</Text>
             <TextInput
+              placeholder="Full name"
+              placeholderTextColor={theme.tabInactive}
+              style={styles.loginFormTextInput}
+              onChangeText={text => setFullName(text)}
+            />
+            <TextInput
               placeholder="Email"
+              placeholderTextColor={theme.tabInactive}
               style={styles.loginFormTextInput}
               onChangeText={text => setEmail(text)}
             />
             <View style={styles.passwordContainer}>
               <TextInput
                 placeholder="Password"
+                placeholderTextColor={theme.tabInactive}
                 style={styles.loginFormTextPassword}
                 secureTextEntry={!showPassword}
                 onChangeText={text => setPassword(text)}
@@ -78,6 +102,7 @@ export default function SignUpScreen() {
             <View style={styles.passwordContainer}>
               <TextInput
                 placeholder="Repeat password"
+                placeholderTextColor={theme.tabInactive}
                 style={styles.loginFormTextPassword}
                 secureTextEntry={!showPassword}
                 onChangeText={text => setRepeatPassword(text)}
@@ -142,7 +167,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
-    placeholderTextColor: theme.tabInactive,
     marginLeft: 20,
     marginRight: 30,
     color: theme.secondary,
@@ -157,7 +181,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
-    placeholderTextColor: theme.tabInactive,
     width: 305,
     marginLeft: 20,
     color: theme.secondary,

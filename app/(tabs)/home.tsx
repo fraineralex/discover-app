@@ -1,10 +1,13 @@
 import React from 'react';
 import MapView from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import { Marker } from "react-native-maps";
 import { useRouter, Link } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { getAuth, signOut } from 'firebase/auth';
+import { firebaseConfig } from '../config';
+import { initializeApp } from 'firebase/app';
 
 export default function HomeScreen() {
   const [location, setLocation] = React.useState({
@@ -21,19 +24,8 @@ export default function HomeScreen() {
   const [user, setUser] = React.useState(null)
   const router = useRouter();
 
-  React.useEffect(() => {
-    async function checkUser() {
-      const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
-      const token = await SecureStore.getItemAsync('token');
-      if (!user && !token) {
-        router.replace('/login');
-      }
-
-      setUser(currentUser);
-    }
-
-    checkUser();
-  }, []);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
   React.useEffect(() => {
     const permission = async () => {
@@ -54,6 +46,19 @@ export default function HomeScreen() {
         }
       });
     };
+
+    async function checkUser() {
+      const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
+      console.log(currentUser);
+      const token = await SecureStore.getItemAsync('token');
+      if (!user && !token) {
+        router.replace('/login');
+      }
+
+      setUser(currentUser);
+    }
+
+    checkUser();
     permission();
   }, []);
 
@@ -74,9 +79,20 @@ export default function HomeScreen() {
     setLocation(geolocation_obj);
   };
 
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('token');
+      await SecureStore.deleteItemAsync('user');
+      await signOut(auth);
+      router.replace('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {user && <Text>Welcome {user.email}</Text>}
+      {user && <Text>Welcome {user.displayName}</Text>}
       <TextInput placeholder="Search location" value={adrees} onChangeText={text => setAdrees(text)} />
       <Button title="search adrees" onPress={get_locations} />
       <View style={styles.mapContainer}>
@@ -92,6 +108,11 @@ export default function HomeScreen() {
           }
         </MapView>
       </View>
+      <TouchableOpacity
+        onPress={handleLogout}
+      >
+        <Text>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
