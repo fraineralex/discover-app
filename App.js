@@ -6,7 +6,12 @@ import { Marker } from "react-native-maps";
 
 export default function App() {
 
-  const [location, setLocation] = React.useState();
+  const [location, setLocation] = React.useState({
+    latitude: 19.0000000,
+    longitude:  -70.162651,
+    latitudeDelta: 2,
+    longitudeDelta: 2,
+  });
   const [adrees, setAdrees] = React.useState();
 
   React.useEffect(() => {
@@ -18,15 +23,25 @@ export default function App() {
       }
 
       let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-      console.log("current location ----------",currentLocation);
+      setLocation({
+        latitude: currentLocation?.coords?.latitude,
+        longitude: currentLocation?.coords?.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
     };
     permission();
   }, []);
 
   const geocode = async () => {
     const geolocaton = await Location.geocodeAsync(adrees);
-    console.log("geolocaton ----------",geolocaton);
+    //TODO::validar si la direccion existe
+    setLocation({
+      latitude: geolocaton[0]?.latitude,
+      longitude: geolocaton[0]?.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
   };
 
   return (
@@ -36,18 +51,10 @@ export default function App() {
       <View style={styles.mapContainer}>
         <MapView 
           style={styles.map}
-          initialRegion={{
-            latitude: location?.coords?.latitude,
-            longitude: location?.coords?.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}>
-            {/* <Marker coordinate={{
-              latitude: location?.coords?.latitude,
-              longitude: location?.coords?.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }} /> */}
+          initialRegion={location}>
+            <Marker coordinate={location}
+            title="My Location" 
+            />
         </MapView>
       </View>
     </View>
