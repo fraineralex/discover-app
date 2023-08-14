@@ -5,14 +5,17 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Marker } from "react-native-maps";
 
 export default function App() {
-
   const [location, setLocation] = React.useState({
-    latitude: 19.0000000,
-    longitude:  -70.162651,
-    latitudeDelta: 2,
-    longitudeDelta: 2,
+    "locationName": "Dominican Republic",
+    "locationMarker": {
+      latitude: 19.0000000,
+      longitude:  -70.162651,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }
   });
   const [adrees, setAdrees] = React.useState();
+  const [markerPlaces, setMarkerPlaces] = React.useState([]);
 
   React.useEffect(() => {
     const permission = async () => {
@@ -24,37 +27,50 @@ export default function App() {
 
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation({
-        latitude: currentLocation?.coords?.latitude,
-        longitude: currentLocation?.coords?.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        "locationName": "My location 22",
+        "locationMarker": {
+          latitude: currentLocation?.coords?.latitude,
+          longitude: currentLocation?.coords?.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }
       });
     };
     permission();
   }, []);
 
-  const geocode = async () => {
+  const get_locations = async () => {
     const geolocaton = await Location.geocodeAsync(adrees);
-    //TODO::validar si la direccion existe
-    setLocation({
-      latitude: geolocaton[0]?.latitude,
-      longitude: geolocaton[0]?.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
+    const newMarkerPlaces = [...markerPlaces, location];
+    const geolocation_obj = {
+      "locationName": adrees,
+      "locationMarker": {
+        latitude: geolocaton[0]?.latitude,
+        longitude: geolocaton[0]?.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }
+    };
+
+    setMarkerPlaces([...newMarkerPlaces, geolocation_obj]);
+    setLocation(geolocation_obj);
   };
 
   return (
     <View style={styles.container}>
       <TextInput placeholder="Search location" value={adrees} onChangeText={setAdrees}/>
-      <Button title="search adrees" onPress={geocode} />
+      <Button title="search adrees" onPress={get_locations} />
       <View style={styles.mapContainer}>
         <MapView 
           style={styles.map}
-          initialRegion={location}>
-            <Marker coordinate={location}
-            title="My Location" 
-            />
+          region={location.locationMarker}
+          >
+            <Marker coordinate={location.locationMarker} title={location.locationName} />
+            {
+              markerPlaces.length > 0 && markerPlaces.map((marker, index) => (
+                <Marker key={index} coordinate={marker.locationMarker} title={marker.locationName} />
+              ))
+            }
         </MapView>
       </View>
     </View>
