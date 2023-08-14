@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import router from '../utils';
+import router from 'expo-router';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -16,29 +16,32 @@ import { FontAwesome } from '@expo/vector-icons';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
+import { useRouter, Link } from 'expo-router';
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
   const handleSignIn = () => {
+    password === '' ? Alert.alert('Please enter a password') : '';
+    email === '' ? Alert.alert('Please enter an email') : '';
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log('signed in!', user);
         router.replace('/home');
       })
       .catch((error) => {
+        Alert.alert(error.message.toString().replace('Firebase: ', ''));
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log('Error signed in:', errorCode, errorMessage);
-        Alert.alert(error)
       }
-      )
+      );
   };
 
   return (
@@ -78,9 +81,7 @@ export default function LoginScreen() {
               <Text style={styles.loginButtonText}>Sign in</Text>
             </TouchableOpacity>
             <View style={styles.footerView}>
-              <TouchableOpacity onPress={handleCreateAccount}>
-                <Text style={styles.firstButtonText}>Don't have an account? <Text style={styles.secondButtonText}>Sign up.</Text></Text>
-              </TouchableOpacity>
+              <Text style={styles.firstButtonText}>Don't have an account? <Link style={styles.secondButtonText} href="/signup">Sign up.</Link></Text>
             </View>
           </View>
         </View>
@@ -198,3 +199,4 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+

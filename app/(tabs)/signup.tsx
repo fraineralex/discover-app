@@ -16,6 +16,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
+import { Link } from 'expo-router';
 
 export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +28,8 @@ export default function SignUpScreen() {
   const auth = getAuth(app);
 
   const handleCreateAccount = () => {
+    password === '' ? Alert.alert('Please enter a password') : '';
+    email === '' ? Alert.alert('Please enter an email') : '';
     password !== repeatPassword ? Alert.alert('Passwords do not match') : '';
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -36,9 +39,9 @@ export default function SignUpScreen() {
       })
       .catch((error) => {
         const errorCode = error.code;
+        Alert.alert(error.message.toString().replace('Firebase: ', ''));
         const errorMessage = error.message;
         console.log('Error creating account:', errorCode, errorMessage);
-        Alert.alert(error)
       }
       )
   };
@@ -97,9 +100,7 @@ export default function SignUpScreen() {
               <Text style={styles.loginButtonText}>Sign up</Text>
             </TouchableOpacity>
             <View style={styles.footerView}>
-              <TouchableOpacity onPress={handleCreateAccount}>
-                <Text style={styles.firstButtonText}>You have an account? <Text style={styles.secondButtonText}>Sign in.</Text></Text>
-              </TouchableOpacity>
+              <Text style={styles.firstButtonText}>You have an account? <Link style={styles.secondButtonText} href="/login">Sign in.</Link></Text>
             </View>
           </View>
         </View>
