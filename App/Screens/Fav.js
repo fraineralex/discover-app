@@ -26,6 +26,7 @@ export default function Search() {
       }
     })();
   }, []);
+  
   return (
     <View>
       <View style={{position:'absolute',zIndex:20}}>

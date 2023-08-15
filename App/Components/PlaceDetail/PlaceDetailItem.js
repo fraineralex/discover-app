@@ -26,7 +26,6 @@ export default function PlaceDetailItem({place,onDirectionClick}) {
 
   const handleSavePlace = () => {
     if (user) {
-      console.log(user)
       savePlace(place, user.uid, (insertId) => {
         if (insertId !== null) {
           // Place saved successfully

@@ -9,21 +9,21 @@ const createPlacesTable = () => {
       `CREATE TABLE IF NOT EXISTS places (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_uuid TEXT NOT NULL,
-        formatted_address TEXT NOT NULL,
-        lat REAL,
-        lng REAL,
-        icon TEXT,
-        name TEXT,
-        open_now INTEGER,
-        photo_reference TEXT,
-        rating REAL,
-        place_id TEXT,
-        price_level INTEGER,
-        reference TEXT,
-        user_ratings_total INTEGER,
         business_status TEXT,
+        formatted_address TEXT NOT NULL,
+        geometry TEXT, -- You might want to use JSON or some other suitable type
+        icon TEXT,
         icon_background_color TEXT,
         icon_mask_base_uri TEXT,
+        name TEXT,
+        opening_hours TEXT, -- You might want to use JSON or some other suitable type
+        photos TEXT, -- You might want to use JSON or some other suitable type
+        place_id TEXT,
+        plus_code TEXT, -- You might want to use JSON or some other suitable type
+        rating REAL,
+        types TEXT, -- You might want to use JSON or some other suitable type
+        reference TEXT,
+        user_ratings_total INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       );`,
@@ -41,13 +41,22 @@ const createPlacesTable = () => {
 };
 
 // Función para obtener todos los registros de la tabla "places" con un ID específico
+// Función para obtener todos los registros de la tabla "places" con un ID específico
 const getPlacesByUserId = (userUuid, callback) => {
   db.transaction(tx => {
     tx.executeSql(
       `SELECT * FROM places WHERE user_uuid = ?;`,
       [userUuid],
       (_, { rows }) => {
-        const places = rows._array;
+        const places = rows._array.map(place => ({
+          ...place,
+          business_status: JSON.parse(place.business_status),
+          geometry: JSON.parse(place.geometry),
+          opening_hours: JSON.parse(place.opening_hours),
+          photos: JSON.parse(place.photos),
+          plus_code: JSON.parse(place.plus_code),
+          types: JSON.parse(place.types)
+        }));
         callback(places);
       },
       (_, error) => {
@@ -63,9 +72,26 @@ const getPlacesByUserId = (userUuid, callback) => {
 const savePlace = (place, userUuid, callback) => {
   db.transaction(tx => {
     tx.executeSql(
-      `INSERT INTO places (user_uuid, formatted_address, lat, lng, icon, name, open_now, photo_reference, rating, place_id, price_level, reference, user_ratings_total, business_status, icon_background_color, icon_mask_base_uri)
+      `INSERT INTO places (user_uuid, business_status, formatted_address, geometry, icon, icon_background_color, icon_mask_base_uri, name, opening_hours, photos, place_id, plus_code, rating, types, reference, user_ratings_total)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-      [userUuid, place.formatted_address, place.geometry.location.lat, place.geometry.location.lng, place.icon, place.name, place.opening_hours.open_now ? 1 : 0, place.photos[0].photo_reference, place.rating, place.place_id, place.price_level, place.reference, place.user_ratings_total, place.business_status, place.icon_background_color, place.icon_mask_base_uri],
+      [
+        userUuid,
+        JSON.stringify(place.business_status),
+        place.formatted_address,
+        JSON.stringify(place.geometry),
+        place.icon,
+        place.icon_background_color,
+        place.icon_mask_base_uri,
+        place.name,
+        JSON.stringify(place.opening_hours),
+        JSON.stringify(place.photos),
+        place.place_id,
+        JSON.stringify(place.plus_code),
+        place.rating,
+        JSON.stringify(place.types),
+        place.reference,
+        place.user_ratings_total
+      ],
       (_, { insertId }) => {
         console.log('Place saved with ID:', insertId);
         callback(insertId);
