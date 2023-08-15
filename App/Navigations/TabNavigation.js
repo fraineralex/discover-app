@@ -30,9 +30,9 @@ export default function TabNavigation() {
       }} />
       <Tab.Screen name="Fav" component={Fav}
        options={{
-        tabBarLabel: 'Fav',
+        tabBarLabel: 'Saved',
         tabBarIcon: ({ color, size }) => (
-          <Ionicons name="ios-heart" color={color} size={size} />
+          <Ionicons name="ios-save" color={color} size={size} />
         ),
       }} />
       <Tab.Screen name="Profile" component={Profile} 

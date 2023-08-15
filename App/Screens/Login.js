@@ -17,7 +17,7 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
 import * as SecureStore from 'expo-secure-store';
 import SignUpScreen from './Signup';
-import * as Location from 'expo-location'; 
+import * as Location from 'expo-location';
 import { useFonts } from 'expo-font';
 import { UserLocationContext } from '../Context/UserLocationContext';
 import TabNavigation from '../Navigations/TabNavigation';
@@ -25,22 +25,27 @@ import { NavigationContainer } from '@react-navigation/native';
 import Colors from '../Shared/Colors';
 
 export default function LoginScreen() {
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [fontsLoaded] = useFonts({
+        'raleway': require('../../assets/Fonts/Raleway-Regular.ttf'),
+        'raleway-bold': require('../../assets/Fonts/Raleway-SemiBold.ttf'),
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showSignUp, setShowSignUp] = useState(false);
-    const [hasUser, setHasUser] = useState(false)
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
-    const [fontsLoaded] = useFonts({
-      'raleway': require('../../assets/Fonts/Raleway-Regular.ttf'),
-      'raleway-bold': require('../../assets/Fonts/Raleway-SemiBold.ttf'),
-  
-    });
+    const [user, setUser] = useState(false)
+    const [token, setToken] = useState('')
 
     useEffect(() => {
-        if (hasUser) {
+        if (user) {
             (async () => {
+                await SecureStore.deleteItemAsync('token');
+                await SecureStore.deleteItemAsync('user');
+                await SecureStore.setItemAsync('token', token);
+                await SecureStore.setItemAsync('user', JSON.stringify(user));
+
                 let { status } = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
                     setErrorMsg('Permission to access location was denied');
@@ -51,11 +56,11 @@ export default function LoginScreen() {
                 setLocation(location);
             })();
         }
-    }, [hasUser]);
+    }, [user]);
 
-    if (hasUser) {
+    if (user) {
         return (
-            <View style={{flex: 1, backgroundColor: Colors.WHITE, paddingTop:20}}>
+            <View style={{ flex: 1, backgroundColor: Colors.WHITE, paddingTop: 20 }}>
                 <UserLocationContext.Provider
                     value={{ location, setLocation }}>
                     <NavigationContainer>
@@ -83,9 +88,8 @@ export default function LoginScreen() {
             .then((userCredential) => {
                 const currentUser = userCredential.user;
                 currentUser.getIdToken().then(async (token) => {
-                    await SecureStore.setItemAsync('token', token);
-                    await SecureStore.setItemAsync('user', JSON.stringify(currentUser));
-                    setHasUser(true)
+                    setToken(token)
+                    setUser(currentUser)
                 });
             })
             .catch((error) => {
@@ -243,7 +247,7 @@ const styles = StyleSheet.create({
     },
     firstButtonText: {
         marginTop: 20,
-        marginBottom:10,
+        marginBottom: 10,
         fontSize: 16,
         color: theme.tabInactive,
     },

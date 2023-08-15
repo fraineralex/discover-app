@@ -9,6 +9,7 @@ import { UserLocationContext } from './App/Context/UserLocationContext';
 import Colors from './App/Shared/Colors';
 import * as SecureStore from 'expo-secure-store';
 import LoginScreen from './App/Screens/Login';
+import './App/database/Place';
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -31,8 +32,7 @@ export default function App() {
     })();
   }, []);
    
-  if(!user) return <LoginScreen />
-   
+  
   useEffect(() => {
     if (user) {
       (async () => {      
@@ -41,24 +41,26 @@ export default function App() {
           setErrorMsg('Permission to access location was denied');
           return;
         }
-  
+        
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
       })();
     }
   }, [user]);
-
-
-  return (
-    <View style={styles.container}>
-    <UserLocationContext.Provider 
-    value={{location,setLocation}}>
-        <NavigationContainer>
-          <TabNavigation/>
-        </NavigationContainer>
-      </UserLocationContext.Provider>
-    </View> 
-  );
+  
+  if(!user) return <LoginScreen />
+  else {
+    return (
+      <View style={styles.container}>
+      <UserLocationContext.Provider 
+      value={{location,setLocation}}>
+          <NavigationContainer>
+            <TabNavigation/>
+          </NavigationContainer>
+        </UserLocationContext.Provider>
+      </View> 
+    );
+  }
 }
 
 const styles = StyleSheet.create({

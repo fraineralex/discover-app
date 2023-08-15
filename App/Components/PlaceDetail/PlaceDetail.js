@@ -48,6 +48,7 @@ export default function PlaceDetail() {
           alignItems:'center',
           borderRadius: 50,
           paddingBottom: 15,
+          marginBottom: 25,
         }}
         onPress={() => onDirectionClick()}
       >

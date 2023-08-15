@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { AntDesign } from "@expo/vector-icons";
 import Colors from '../../Shared/Colors';
 import { Image } from 'react-native';
@@ -7,7 +7,39 @@ import { Ionicons } from "@expo/vector-icons";
 import GoogleMapView from '../Home/GoogleMapView';
 import { TouchableOpacity } from 'react-native';
 import Share from '../../Services/Share';
-export default function PlaceDetailItem({place,onDirectionClick}) {  
+import { savePlace } from '../../database/Place';
+import * as SecureStore from 'expo-secure-store';
+
+export default function PlaceDetailItem({place,onDirectionClick}) { 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
+      const token = await SecureStore.getItemAsync('token');
+      if (token) {
+        setUser(currentUser);
+      }
+
+    })();
+  }, []);
+
+  const handleSavePlace = () => {
+    if (user) {
+      console.log(user)
+      savePlace(place, user.uid, (insertId) => {
+        if (insertId !== null) {
+          // Place saved successfully
+          console.log('Place saved successfully');
+        } else {
+          console.error('Error saving place');
+        }
+      });
+    } else {
+      console.warn('User not authenticated. Cannot save place.');
+    }
+  };
+
   return (
     <View>
        <Text style={{ fontSize: 26, fontFamily: "raleway-bold" }}>
@@ -93,9 +125,23 @@ export default function PlaceDetailItem({place,onDirectionClick}) {
          <Ionicons name="md-share-outline" size={24} color="black" />
           <Text style={{ fontFamily: "raleway", fontSize: 16 }}>Share</Text>
         </TouchableOpacity>
-        </View>
-
-     
+        <TouchableOpacity onPress={handleSavePlace}
+          style={{
+            direction: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+            backgroundColor:Colors.GRAY,
+            width:90,
+            padding:3,
+            borderRadius:40,
+            justifyContent:'center'
+          }}
+        >
+         <Ionicons name="save-outline" size={24} color="black" />
+          <Text style={{ fontFamily: "raleway", fontSize: 16 }}>Save</Text>
+        </TouchableOpacity>
+        </View>     
     </View>
   )
 }  

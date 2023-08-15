@@ -7,6 +7,7 @@ import GlobalApi from '../Services/GlobalApi'
 import PlaceList from '../Components/Home/PlaceList'
 import { ScrollView } from 'react-native'
 import { UserLocationContext } from '../Context/UserLocationContext'
+import { darkMode as theme } from '../theme'
 
 export default function Home() {
 
