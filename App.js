@@ -7,33 +7,48 @@ import * as Location from 'expo-location';
 import { useFonts } from 'expo-font';
 import { UserLocationContext } from './App/Context/UserLocationContext';
 import Colors from './App/Shared/Colors';
-import { ActivityIndicator } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import LoginScreen from './App/Screens/Login';
+
 export default function App() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [user, setUser] = useState(null)
   const [fontsLoaded] = useFonts({
     'raleway': require('./assets/Fonts/Raleway-Regular.ttf'),
     'raleway-bold': require('./assets/Fonts/Raleway-SemiBold.ttf'),
 
   });
-   
-   
+
   useEffect(() => {
     (async () => {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+      const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
+      const token = await SecureStore.getItemAsync('token');
+      if (token) {
+        setUser(currentUser);
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-     
     })();
-
-    
   }, []);
+   
+  if(!user) return <LoginScreen />
+   
+  useEffect(() => {
+    if (user) {
+      (async () => {      
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+  
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      })();
+    }
+  }, [user]);
+
+
   return (
     <View style={styles.container}>
     <UserLocationContext.Provider 
