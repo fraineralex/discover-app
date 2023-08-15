@@ -37,7 +37,7 @@ export default function HomeScreen() {
 
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation({
-        "locationName": "My location 22",
+        "locationName": "My location",
         "locationMarker": {
           latitude: currentLocation?.coords?.latitude,
           longitude: currentLocation?.coords?.longitude,
@@ -92,10 +92,8 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {user && <Text>Welcome {user.displayName}</Text>}
-      <TextInput placeholder="Search location" value={adrees} onChangeText={text => setAdrees(text)} />
-      <Button title="search adrees" onPress={get_locations} />
       <View style={styles.mapContainer}>
+        {/* map */}
         <MapView
           style={styles.map}
           region={location.locationMarker}
@@ -107,15 +105,35 @@ export default function HomeScreen() {
             ))
           }
         </MapView>
+
+        {/* search bar */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput} 
+            placeholder="Search location" 
+            value={adrees} 
+            onChangeText={text => setAdrees(text)} 
+          />
+          <Button
+            style={styles.searchBnt} 
+            title="search" 
+            onPress={get_locations} 
+            />
+        </View>
+
+        {/* logout */}
+        <View style={styles.logoutBnt}>
+          <TouchableOpacity
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity
-        onPress={handleLogout}
-      >
-        <Text>Logout</Text>
-      </TouchableOpacity>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -125,13 +143,63 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     width: '100%',
-    height: '40%',
+    height: '100%',
   },
   map: {
     width: '100%',
     height: '100%',
   },
-  navBar: {
-    backgroundColor: 'red',
+  logoutBnt: {
+    position: 'absolute',
+    top: "80%",
+    left: "5%",
+    backgroundColor: '#35363a',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#35363a',
+    shadowColor: '#35363a',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    padding: 10,
+    borderRadius: 50,
+  },
+  logoutText: {
+    fontFamily: 'Roboto',
+    color: '#fff',
+    fontSize: 16,
+  },
+  searchContainer: {
+    position: 'absolute',
+    top: "10%",
+    left: "3%",
+    right: "3%",
+    backgroundColor: '#35363a',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#35363a',
+    shadowColor: '#35363a',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    padding: 10,
+    borderRadius: 50,
+  },
+  searchInput: {
+    width: '70%',
+    height: 40,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    padding: 10,
+  },
+  searchBnt: {
+    backgroundColor: '#fff',
+    borderRadius: 100,
+    padding: 10,
   },
 });
