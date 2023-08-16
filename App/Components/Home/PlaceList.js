@@ -14,7 +14,7 @@ export default function PlaceList({placeList}) {
   return (
     <View>
       <Text
-      style={{fontSize:20,fontFamily:'raleway-bold',marginTop:10}}
+      style={{fontSize:20,fontFamily:'raleway-bold',marginTop:20, fontWeight:'bold'}}
       >Found {placeList.length} Places</Text>
 
       <FlatList

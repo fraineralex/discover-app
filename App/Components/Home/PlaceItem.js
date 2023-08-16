@@ -24,7 +24,7 @@ export default function PlaceItem({ place }) {
         }}
         style={{ width: 110, height: 110, borderRadius: 15 }}
       />:
-      <Image source={require('./../../../assets/placeholder.jpg')}
+      <Image source={require('./../../../assets/placeholder.png')}
       style={{ width: 110, height: 110, borderRadius: 15 }}
       />}
       <View style={{flex:1}}>

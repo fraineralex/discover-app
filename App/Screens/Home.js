@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     if (location) {
-      GetNearBySearchPlace('restaurant');
+      GetNearBySearchPlace('restaurant, food, cafe, gas, school, gym, park, store, hospital, pharmacy, atm, bank, bar, bus_station, church, city_hall, courthouse, dentist, doctor, fire_station, library, museum, police, post_office, shopping_mall, spa, stadium, university, zoo');
     }
   }, [location]);
 

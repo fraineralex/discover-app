@@ -31,7 +31,7 @@ export default function BusinessItem({ place }) {
           }}
           style={{ width: 120, height: 80, borderRadius: 10 }}
         /> :
-          <Image source={require('./../../../assets/placeholder.jpg')}
+          <Image source={require('./../../../assets/placeholder.png')}
             style={{ width: 130, height: 100, borderRadius: 9 }}
           />}
       <Text

@@ -77,7 +77,7 @@ const savePlace = (place, userUuid, callback) => {
       [
         userUuid,
         JSON.stringify(place.business_status),
-        place.formatted_address,
+        place?.formatted_address || '',
         JSON.stringify(place.geometry),
         place.icon,
         place.icon_background_color,
