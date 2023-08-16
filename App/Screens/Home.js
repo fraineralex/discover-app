@@ -1,40 +1,45 @@
-import { View, Text, ActivityIndicator } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import Header from '../Components/Home/Header'
-import GoogleMapView from '../Components/Home/GoogleMapView'
-import CategoryList from '../Components/Home/CategoryList'
-import GlobalApi from '../Services/GlobalApi'
-import PlaceList from '../Components/Home/PlaceList'
-import { ScrollView } from 'react-native'
-import { UserLocationContext } from '../Context/UserLocationContext'
-import { darkMode as theme } from '../theme'
+import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import Header from '../Components/Home/Header';
+import GoogleMapView from '../Components/Home/GoogleMapView';
+import CategoryList from '../Components/Home/CategoryList';
+import GlobalApi from '../Services/GlobalApi';
+import PlaceList from '../Components/Home/PlaceList';
+import { UserLocationContext } from '../Context/UserLocationContext';
+import { darkMode as theme } from '../theme';
+import { LogBox } from 'react-native';
+
+// Ignorar todas las advertencias
+LogBox.ignoreAllLogs();
 
 export default function Home() {
+  const [placeList, setPlaceList] = useState([]);
+  const { location, setLocation } = useContext(UserLocationContext);
 
-  const [placeList,setPlaceList]=useState([]);
-  const {location,setLocation}=useContext(UserLocationContext);
-  useEffect(()=>{
-    if(location)
-    {
-       GetNearBySearchPlace('restaurant'); 
+  useEffect(() => {
+    if (location) {
+      GetNearBySearchPlace('restaurant');
     }
-  },[location])
-  
-  const GetNearBySearchPlace=(value)=>{
-   
-    GlobalApi.nearByPlace(location.coords.latitude,
-      location.coords.longitude,value).then(resp=>{
+  }, [location]);
 
-          setPlaceList(resp.data.results);
+  const GetNearBySearchPlace = (value) => {
+    GlobalApi.nearByPlace(location.coords.latitude, location.coords.longitude, value)
+      .then((resp) => {
+        setPlaceList(resp.data.results);
+      })
+      .catch((error) => {
+        console.error('Error fetching nearby places:', error);
+      });
+  };
 
-    })
-  } 
   return (
-    <ScrollView style={{padding:20,backgroundColor:'#fff',flex:1}}>
-        {/* <Header/> */}
+    <View style={{ padding:20, backgroundColor:'#fff', flex:1 }}>
+      <ScrollView style={{ backgroundColor: theme.backgroundColor }}>
+      {/* <Header /> */}
         <GoogleMapView placeList={placeList} />
-        <CategoryList setSelectedCategory={(value)=>GetNearBySearchPlace(value)}/>
-       {placeList? <PlaceList placeList={placeList} />:null}
-    </ScrollView>
-  )
+        <CategoryList setSelectedCategory={(value) => GetNearBySearchPlace(value)} />
+        {placeList.length > 0 ? <PlaceList placeList={placeList} /> : null}
+      </ScrollView>
+    </View>
+  );
 }

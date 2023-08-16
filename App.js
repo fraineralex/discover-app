@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import TabNavigation from './App/Navigations/TabNavigation';
 import { useEffect, useState } from 'react';
-import * as Location from 'expo-location'; 
+import * as Location from 'expo-location';
 import { useFonts } from 'expo-font';
 import { UserLocationContext } from './App/Context/UserLocationContext';
 import Colors from './App/Shared/Colors';
@@ -24,49 +24,53 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const currentUser = JSON.parse(await SecureStore.getItemAsync('user'));
+      if (!currentUser) {
+        ReturnLogin()
+      }
       const token = await SecureStore.getItemAsync('token');
-      if (token) {
+      if (token && currentUser) {
         setUser(currentUser);
       }
 
     })();
   }, []);
-   
-  
+
+
   useEffect(() => {
     if (user) {
-      (async () => {      
+      (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           setErrorMsg('Permission to access location was denied');
           return;
         }
-        
+
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
       })();
     }
   }, [user]);
-  
-  if(!user) return <LoginScreen />
-  else {
+
+  function ReturnLogin() {
+    if (!user) return <LoginScreen />
+  }
+
     return (
       <View style={styles.container}>
-      <UserLocationContext.Provider 
-      value={{location,setLocation}}>
+        <UserLocationContext.Provider
+          value={{ location, setLocation }}>
           <NavigationContainer>
-            <TabNavigation/>
+            <TabNavigation />
           </NavigationContainer>
         </UserLocationContext.Provider>
-      </View> 
+      </View>
     );
   }
-}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.WHITE,
-    paddingTop:20
+    paddingTop: 20
   },
 });
