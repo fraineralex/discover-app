@@ -11,6 +11,7 @@ import Colors from "./App/Shared/Colors";
 import * as SecureStore from "expo-secure-store";
 import LoginScreen from "./App/Screens/Login";
 import "./App/database/Place";
+import "./App/database/Users";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();

@@ -45,6 +45,7 @@ export default function LoginScreen({ navigation }) {
                     await SecureStore.deleteItemAsync("user");
                     await SecureStore.setItemAsync("token", token);
                     await SecureStore.setItemAsync("user", JSON.stringify(currentUser));
+                    console.log(currentUser)
                     userContext.setUser(currentUser)
                 });
             })
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
         marginTop: 150,
         marginBottom: 30,
         textAlign: "center",
-        color: theme.headerText,
+        color: theme.secondary,
     },
     loginFormView: {
         flex: 1,
@@ -139,8 +140,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: theme.inputBorder,
-        backgroundColor: theme.inputBackground,
         paddingLeft: 10,
         marginTop: 5,
         marginBottom: 8,
@@ -153,8 +152,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: theme.inputBorder,
-        backgroundColor: theme.inputBackground,
         paddingLeft: 10,
         marginTop: 5,
         marginBottom: 8,
@@ -180,7 +177,7 @@ const styles = StyleSheet.create({
     },
     loginButtonText: {
         fontSize: 18,
-        color: theme.secondary,
+        color: theme.primary,
     },
     forgotPasswordInput: {
         fontSize: 12,
@@ -203,7 +200,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 10,
         fontSize: 16,
-        color: theme.tabInactive,
+        color: theme.secondary,
     },
     secondButtonText: {
         fontSize: 16,

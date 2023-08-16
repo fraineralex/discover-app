@@ -19,6 +19,7 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../config";
+import { saveUser } from "../database/Users";
 
 export default function SignUpScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,17 +48,34 @@ export default function SignUpScreen({ navigation }) {
         email,
         password
       );
+      const randomNumber = Math.floor(Math.random() * 6) + 1;
+      const photoUrl = `https://bootdey.com/img/Content/avatar/avatar${randomNumber}.png`
       const user = userCredential.user;
       if (fullName) {
         await updateProfile(user, {
           displayName: fullName,
+          photoURL: photoUrl,
+        });
+
+        // Save the user in the local SQLite database
+        const savedUser = {
+          displayName: fullName,
+          email: user.email,
+          photoUrl: photoUrl,
+        };
+        saveUser(savedUser, (insertId) => {
+          if (insertId !== null) {
+            console.log("User saved in local database with ID:", insertId);
+          } else {
+            console.error("Error saving user in local database.");
+          }
         });
 
         console.log("User profile updated");
       }
 
       navigation.navigate("Login");
-      
+
     } catch (error) {
       const errorCode = error.code;
       Alert.alert(error.message.toString().replace("Firebase: ", ""));
@@ -163,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 150,
     marginBottom: 30,
     textAlign: "center",
-    color: theme.headerText,
+    color: theme.secondary,
   },
   loginFormView: {
     flex: 1,
@@ -175,8 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: theme.inputBorder,
-    backgroundColor: theme.inputBackground,
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
@@ -189,8 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: theme.inputBorder,
-    backgroundColor: theme.inputBackground,
     paddingLeft: 10,
     marginTop: 5,
     marginBottom: 8,
@@ -216,7 +230,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     fontSize: 18,
-    color: theme.secondary,
+    color: theme.primary,
   },
   forgotPasswordInput: {
     fontSize: 12,
@@ -231,15 +245,12 @@ const styles = StyleSheet.create({
   footerView: {
     flex: 1,
     alignItems: "center",
-    bottom: 0,
-    borderTopColor: theme.inputBorder,
-    borderTopWidth: 1,
   },
   firstButtonText: {
     marginTop: 20,
     marginBottom: 10,
     fontSize: 16,
-    color: theme.tabInactive,
+    color: theme.secondary,
   },
   secondButtonText: {
     fontSize: 16,

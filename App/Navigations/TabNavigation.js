@@ -7,10 +7,11 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import Home from "../Screens/Home";
 import Fav from "../Screens/Fav";
 import Search from "../Screens/Search";
-import Profile from "../Screens/Profile";
+import Settings from "../Screens/Settings";
 import LoginScreen from "../Screens/Login";
 import HomeNavigation from "./HomeNavigation";
 import SignUpScreen from "../Screens/Signup";
+import Users from "../Screens/Users";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,8 +41,10 @@ const MainTabs = () => {
       <Tab.Screen
         name="Home"
         component={HomeNavigation}
+        
         options={{
           tabBarLabel: "Home",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" color={color} size={size} />
           ),
@@ -52,6 +55,7 @@ const MainTabs = () => {
         component={Search}
         options={{
           tabBarLabel: "Search",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" color={color} size={size} />
           ),
@@ -62,18 +66,31 @@ const MainTabs = () => {
         component={Fav}
         options={{
           tabBarLabel: "Saved",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="ios-save" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="Users"
+        component={Users}
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Users",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="user-circle-o" color={color} size={size} />
+            <Ionicons name="people" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarLabel: "Settings",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-sharp" size={size} color="{color}" />
           ),
         }}
       />

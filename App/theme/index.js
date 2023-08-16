@@ -1,8 +1,8 @@
 export const darkMode = {
-    primary: "#000000",
+    primary: "#fff",
     inputBackground: "#222222",
     inputBorder: "#333333",
-    secondary: "#FFFFFF",
+    secondary: "#000000",
     tabActive: "#FFFFFF",
     tabInactive: "#CCCCCC",
     headerText: "#FFFFFF",

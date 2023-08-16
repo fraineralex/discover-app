@@ -11,18 +11,18 @@ const createPlacesTable = () => {
         user_uuid TEXT NOT NULL,
         business_status TEXT,
         formatted_address TEXT NOT NULL,
-        geometry TEXT, -- You might want to use JSON or some other suitable type
+        geometry TEXT UNIQUE,
         icon TEXT,
         icon_background_color TEXT,
         icon_mask_base_uri TEXT,
         name TEXT,
-        opening_hours TEXT, -- You might want to use JSON or some other suitable type
-        photos TEXT, -- You might want to use JSON or some other suitable type
-        place_id TEXT,
-        plus_code TEXT, -- You might want to use JSON or some other suitable type
+        opening_hours TEXT,
+        photos TEXT,
+        place_id TEXT UNIQUE,
+        plus_code TEXT,
         rating REAL,
-        types TEXT, -- You might want to use JSON or some other suitable type
-        reference TEXT,
+        types TEXT,
+        reference TEXT UNIQUE,
         user_ratings_total INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
