@@ -36,13 +36,14 @@ export default function SearchBar({setSearchText}) {
             gap: 5,
             elevation: 0.7,
             alignItems: "center",
-            backgroundColor: Colors.WHITE,
-            borderRadius: 5,
+            backgroundColor: '#ffffff',
+            borderRadius: 20,
           }}
         >
-          <Ionicons name="search" size={24} color={Colors.DARK_GRAY} />
+
+          <Ionicons name="location-sharp" size={24} color="red" />
           <TextInput
-            placeholder="Search"
+            placeholder="Search here"
             style={{ backgroundColor: Colors.WHITE, width: "80%" }}
             onChangeText={(value) => setSearchInput(value)}
             onSubmitEditing={() => setSearchText(searchInput)}

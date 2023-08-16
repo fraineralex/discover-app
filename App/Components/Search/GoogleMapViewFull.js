@@ -10,6 +10,7 @@ import { savePlace } from '../../database/Place';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
 import StarRating from './Rating';
+import { Octicons } from '@expo/vector-icons';
 
 export default function GoogleMapViewFull({ placeList }) {
   const [mapRegion, setMapRegion] = useState([]);
@@ -38,6 +39,7 @@ export default function GoogleMapViewFull({ placeList }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const { location, setLocation } = useContext(UserLocationContext);
   const [selectedRating, setSelectedRating] = useState(0);
+  const [mapType, setMapType] = useState('standard');
 
   const [user, setUser] = useState(null);
 
@@ -52,6 +54,19 @@ export default function GoogleMapViewFull({ placeList }) {
     })();
   }, []);
 
+  const handleMapTypeChange = () => {
+    // Cambiar el tipo de mapa
+    if (mapType === 'standard') {
+      setMapType('satellite');
+    } else if (mapType === 'satellite') {
+      setMapType('hybrid');
+    } else if (mapType === 'hybrid') {
+      setMapType('terrain');
+    } else {
+      setMapType('standard');
+    }
+  };
+
   const handleSavePlace = () => {
     const newPlace = {
       formatted_address: formattedAddress,
@@ -64,7 +79,7 @@ export default function GoogleMapViewFull({ placeList }) {
       types: ['locality', 'political', 'point_of_interest', 'establishment', 'park', 'restaurant', 'store', 'university',],
       place_id: `${formattedAddress}-${geometry.location.lat}-${geometry.location.lng}`.trim(),
       reference: `${formattedAddress}-${geometry.location.lat}-${geometry.location.lng}`.trim(),
-      user_ratings_total: selectedRating*53,
+      user_ratings_total: selectedRating * 53,
       rating: selectedRating === 5 ? 5 : selectedRating + Math.round(Math.random() * selectedRating) / 10,
     }
     console.log(newPlace);
@@ -182,7 +197,9 @@ export default function GoogleMapViewFull({ placeList }) {
           showsUserLocation={true}
           region={mapRegion}
           onLongPress={handleMapLongPress}
+          mapType={mapType}
         >
+
           <Marker title="You" coordinate={mapRegion} />
           {placeList.map((item, index) =>
             index <= 4 ? (
@@ -198,6 +215,13 @@ export default function GoogleMapViewFull({ placeList }) {
           )}
         </MapView>
       ) : null}
+
+      <TouchableOpacity
+        style={styles.mapTypeButton}
+        onPress={handleMapTypeChange}
+      >
+        <Octicons name="stack" size={24} color="black" />
+      </TouchableOpacity>
 
       <Modal
         visible={modalVisible}
@@ -347,6 +371,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginBottom: 12,
+  },
+  mapTypeButton: {
+    position: 'absolute',
+    top: 100,
+    right: 10,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+  },
+  mapTypeButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
