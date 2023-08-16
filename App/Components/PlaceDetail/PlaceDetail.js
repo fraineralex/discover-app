@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function PlaceDetail() {
   const param=useRoute().params;
-  const [place,setPlace]=useState([]);
+  const [place, setPlace]=useState([]);
 
   useEffect(()=>{
    setPlace(param.place)

@@ -20,7 +20,7 @@ export default function BusinessList({placeList}) {
         <FlatList
         data={placeList}
         horizontal={true}
-        renderItem={({item,index})=>index<=6&&(
+        renderItem={({item,index})=>(
         <TouchableOpacity onPress={()=>navigation.navigate(
             'place-detail',
             {
