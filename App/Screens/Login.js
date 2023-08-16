@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -15,61 +15,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../config';
+import { UserContext } from '../Context/UserContext';
 import * as SecureStore from 'expo-secure-store';
-import SignUpScreen from './Signup';
-import * as Location from 'expo-location';
-import { useFonts } from 'expo-font';
-import { UserLocationContext } from '../Context/UserLocationContext';
-import TabNavigation from '../Navigations/TabNavigation';
-import { NavigationContainer } from '@react-navigation/native';
-import Colors from '../Shared/Colors';
 
-export default function LoginScreen() {
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
-    const [fontsLoaded] = useFonts({
-        'raleway': require('../../assets/Fonts/Raleway-Regular.ttf'),
-        'raleway-bold': require('../../assets/Fonts/Raleway-SemiBold.ttf'),
-    });
+export default function LoginScreen({ navigation }) {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showSignUp, setShowSignUp] = useState(false);
-    const [user, setUser] = useState(false)
-    const [token, setToken] = useState('')
-
-    useEffect(() => {
-        if (user) {
-            (async () => {
-                await SecureStore.deleteItemAsync('token');
-                await SecureStore.deleteItemAsync('user');
-                await SecureStore.setItemAsync('token', token);
-                await SecureStore.setItemAsync('user', JSON.stringify(user));
-
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    setErrorMsg('Permission to access location was denied');
-                    return;
-                }
-
-                let location = await Location.getCurrentPositionAsync({});
-                setLocation(location);
-            })();
-        }
-    }, [user]);
-
-    if (user) {
-        return (
-            <View style={{ flex: 1, backgroundColor: Colors.WHITE, paddingTop: 20 }}>
-                <UserLocationContext.Provider
-                    value={{ location, setLocation }}>
-                    <NavigationContainer>
-                        <TabNavigation />
-                    </NavigationContainer>
-                </UserLocationContext.Provider>
-            </View>
-        );
-    }
+    const userContext = useContext(UserContext);
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -88,8 +41,11 @@ export default function LoginScreen() {
             .then((userCredential) => {
                 const currentUser = userCredential.user;
                 currentUser.getIdToken().then(async (token) => {
-                    setToken(token)
-                    setUser(currentUser)
+                    await SecureStore.deleteItemAsync("token");
+                    await SecureStore.deleteItemAsync("user");
+                    await SecureStore.setItemAsync("token", token);
+                    await SecureStore.setItemAsync("user", JSON.stringify(currentUser));
+                    userContext.setUser(currentUser)
                 });
             })
             .catch((error) => {
@@ -102,10 +58,8 @@ export default function LoginScreen() {
     };
 
     const handleSignUpPress = () => {
-        setShowSignUp(true);
+        navigation.navigate('Signup')
     };
-
-    if (showSignUp) return <SignUpScreen />;
 
     return (
         <KeyboardAvoidingView style={styles.containerView} behavior="padding">
