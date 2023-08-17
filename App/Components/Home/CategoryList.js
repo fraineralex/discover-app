@@ -63,7 +63,7 @@ export default function CategoryList({ setSelectedCategory }) {
         fontFamily: 'raleway-bold',
         marginTop: 10
 
-      }} >Select Top Category</Text>
+      }} >Select Type of places</Text>
 
       <FlatList
         data={categoryList}

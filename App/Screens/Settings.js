@@ -41,7 +41,7 @@ export default function Settings() {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../assets/user.png")} style={styles.userPhoto} />
+      <Image source={{ uri: userContext.user.photoURL }} style={styles.userPhoto} />
       <Text style={styles.userInfoText}><Text style={{fontWeight: 'bold'}}>Name: </Text>{userContext.user.displayName}</Text>
       <Text style={styles.userInfoText}><Text style={{fontWeight: 'bold'}}>Email: </Text>{userContext.user.email}</Text>
       <Text style={styles.userInfoText}><Text style={{fontWeight: 'bold'}}>Created: </Text>{createdAt}</Text>

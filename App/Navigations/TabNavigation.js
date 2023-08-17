@@ -90,7 +90,7 @@ const MainTabs = () => {
           tabBarLabel: "Settings",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-sharp" size={size} color="{color}" />
+            <Ionicons name="settings-sharp" size={size} color={color} />
           ),
         }}
       />

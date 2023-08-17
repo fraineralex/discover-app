@@ -36,7 +36,7 @@ export default function Home() {
     <View style={{ padding:20, backgroundColor:'#fff', flex:1 }}>
       <ScrollView style={{ backgroundColor: theme.backgroundColor }}>
       {/* <Header /> */}
-        {/* <GoogleMapView placeList={placeList} /> */}
+        <GoogleMapView placeList={placeList} />
         <CategoryList setSelectedCategory={(value) => GetNearBySearchPlace(value)} />
         {placeList.length > 0 ? <PlaceList placeList={placeList} /> : null}
       </ScrollView>
