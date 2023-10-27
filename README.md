@@ -7,6 +7,7 @@ Discover App is an interactive local tourism guide app developed using React Nat
 - React Native
 - Expo
 - Google places
+- SQLite
 
 ## 🧑‍🚀 Developers
 - [Frainer Encarnación](https://github.com/fraineralex)
